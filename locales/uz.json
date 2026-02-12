@@ -163,6 +163,12 @@
   "admin_weekly_title": "Oxirgi 7 kun eslatmalar:",
   "admin_weekly_empty": "Haftalik ma'lumot yo'q.",
   "admin_cities_chart_title": "Top shaharlar grafigi:",
+  "admin_users_list": "Userlar ro'yxati",
+  "admin_users_list_title": "Oxirgi userlar:",
+  "admin_users_list_empty": "Userlar topilmadi.",
+  "admin_users_list_item": "{index}. {username} | {name} | {status}",
+  "user_status_active": "aktiv",
+  "user_status_inactive": "noaktiv",
 
   "broadcast_prompt": "Broadcast xabarni yuboring:",
   "broadcast_done": "Broadcast yakunlandi. Yuborildi: {count}",

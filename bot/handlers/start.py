@@ -27,10 +27,13 @@ async def set_language_handler(
     new_lang = callback.data.split(":", 1)[1]
     user = db_user
     if user is None:
+        last = getattr(callback.from_user, "last_name", None)
+        full_name = f"{callback.from_user.first_name} {last}".strip() if last else callback.from_user.first_name
         user = await get_or_create_user(
             session=db,
             telegram_id=callback.from_user.id,
             username=callback.from_user.username,
+            full_name=full_name,
             default_lang=getattr(settings, "DEFAULT_LANG", "uz"),
         )
     await update_user_lang(db, user.id, new_lang)

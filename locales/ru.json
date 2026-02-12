@@ -163,6 +163,12 @@
   "admin_weekly_title": "Напоминания за 7 дней:",
   "admin_weekly_empty": "Нет данных за неделю.",
   "admin_cities_chart_title": "График топ городов:",
+  "admin_users_list": "Список пользователей",
+  "admin_users_list_title": "Последние пользователи:",
+  "admin_users_list_empty": "Пользователей нет.",
+  "admin_users_list_item": "{index}. {username} | {name} | {status}",
+  "user_status_active": "активен",
+  "user_status_inactive": "неактивен",
 
   "broadcast_prompt": "Отправьте текст для рассылки:",
   "broadcast_done": "Рассылка завершена. Отправлено: {count}",

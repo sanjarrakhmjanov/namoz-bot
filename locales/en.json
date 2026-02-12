@@ -163,6 +163,12 @@
   "admin_weekly_title": "Reminders last 7 days:",
   "admin_weekly_empty": "No weekly data.",
   "admin_cities_chart_title": "Top cities chart:",
+  "admin_users_list": "Users list",
+  "admin_users_list_title": "Recent users:",
+  "admin_users_list_empty": "No users found.",
+  "admin_users_list_item": "{index}. {username} | {name} | {status}",
+  "user_status_active": "active",
+  "user_status_inactive": "inactive",
 
   "broadcast_prompt": "Send the broadcast message:",
   "broadcast_done": "Broadcast done. Sent: {count}",

@@ -19,10 +19,13 @@ router = Router()
 async def _ensure_user(db_user, db, settings, from_user):
     if db_user is not None:
         return db_user
+    last = getattr(from_user, "last_name", None)
+    full_name = f"{from_user.first_name} {last}".strip() if last else from_user.first_name
     return await get_or_create_user(
         session=db,
         telegram_id=from_user.id,
         username=from_user.username,
+        full_name=full_name,
         default_lang=getattr(settings, "DEFAULT_LANG", "uz"),
     )
 

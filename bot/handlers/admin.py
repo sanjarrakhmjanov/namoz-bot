@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import html
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from aiogram import Router, F
 from aiogram.filters import Command
@@ -10,7 +11,7 @@ from aiogram.types import CallbackQuery, Message
 
 from sqlalchemy import text
 
-from bot.db.crud import get_admin_stats, get_weekly_reminder_stats, list_users
+from bot.db.crud import get_admin_stats, get_weekly_reminder_stats, list_users, list_users_recent
 from bot.handlers.states import AdminStates
 from bot.keyboards.inline import admin_keyboard
 from bot.utils.i18n import I18n
@@ -29,6 +30,13 @@ def _bar(value: int, max_value: int, width: int = 10) -> str:
         return ""
     count = max(1, int((value / max_value) * width)) if value else 0
     return "#" * count
+
+
+def _user_status_text(i18n: I18n, lang: str, last_active_at: datetime | None) -> str:
+    if not last_active_at:
+        return i18n.t("user_status_inactive", lang)
+    threshold = datetime.now(timezone.utc) - timedelta(days=7)
+    return i18n.t("user_status_active", lang) if last_active_at >= threshold else i18n.t("user_status_inactive", lang)
 
 
 @router.message(Command("admin"))
@@ -84,6 +92,18 @@ async def admin_action(callback: CallbackQuery, i18n: I18n, lang: str, db, setti
             lines = [i18n.t("admin_cities_chart_title", lang)]
             for name, count in stats["top_cities"]:
                 lines.append(f"{name} | {_bar(count, max_value)} {count}")
+            text = "\n".join(lines)
+    elif action == "users_list":
+        users = await list_users_recent(db, limit=50)
+        if not users:
+            text = i18n.t("admin_users_list_empty", lang)
+        else:
+            lines = [i18n.t("admin_users_list_title", lang)]
+            for idx, user in enumerate(users, start=1):
+                username = f"@{user.username}" if user.username else "-"
+                name = html.escape(user.full_name or "-")
+                status = _user_status_text(i18n, lang, user.last_active_at)
+                lines.append(i18n.t("admin_users_list_item", lang, index=idx, username=username, name=name, status=status))
             text = "\n".join(lines)
     else:
         try:

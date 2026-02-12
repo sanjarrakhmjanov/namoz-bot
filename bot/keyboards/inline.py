@@ -151,6 +151,7 @@ def admin_keyboard(i18n: I18n, lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.add(
         InlineKeyboardButton(text=i18n.t("admin_users", lang), callback_data="admin:users"),
+        InlineKeyboardButton(text=i18n.t("admin_users_list", lang), callback_data="admin:users_list"),
         InlineKeyboardButton(text=i18n.t("admin_reminders", lang), callback_data="admin:reminders"),
         InlineKeyboardButton(text=i18n.t("admin_top_cities", lang), callback_data="admin:top_cities"),
         InlineKeyboardButton(text=i18n.t("admin_weekly", lang), callback_data="admin:weekly"),

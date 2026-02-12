@@ -58,10 +58,13 @@ class I18nMiddleware(BaseMiddleware):
         from_user = self._extract_from_user(event)
         if from_user is not None and "db" in data:
             default_lang = self._map_language(from_user.language_code, self._default_lang)
+            last = getattr(from_user, "last_name", None)
+            full_name = f"{from_user.first_name} {last}".strip() if last else from_user.first_name
             user = await get_or_create_user(
                 session=data["db"],
                 telegram_id=from_user.id,
                 username=from_user.username,
+                full_name=full_name,
                 default_lang=default_lang,
             )
             data["db_user"] = user

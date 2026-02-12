@@ -43,10 +43,13 @@ async def set_location_command(message: Message, i18n: I18n, lang: str, state: F
 @router.message(LocationStates.waiting_city, F.location)
 async def location_received(message: Message, i18n: I18n, lang: str, db_user, db, aladhan: AladhanClient, settings, scheduler_service, state: FSMContext) -> None:
     if db_user is None:
+        last = getattr(message.from_user, "last_name", None)
+        full_name = f"{message.from_user.first_name} {last}".strip() if last else message.from_user.first_name
         db_user = await get_or_create_user(
             session=db,
             telegram_id=message.from_user.id,
             username=message.from_user.username,
+            full_name=full_name,
             default_lang=getattr(settings, "DEFAULT_LANG", "uz"),
         )
     lat = message.location.latitude
@@ -68,10 +71,13 @@ async def location_received(message: Message, i18n: I18n, lang: str, db_user, db
 @router.message(LocationStates.waiting_city, F.text)
 async def city_received(message: Message, i18n: I18n, lang: str, db_user, db, aladhan: AladhanClient, settings, scheduler_service, state: FSMContext) -> None:
     if db_user is None:
+        last = getattr(message.from_user, "last_name", None)
+        full_name = f"{message.from_user.first_name} {last}".strip() if last else message.from_user.first_name
         db_user = await get_or_create_user(
             session=db,
             telegram_id=message.from_user.id,
             username=message.from_user.username,
+            full_name=full_name,
             default_lang=getattr(settings, "DEFAULT_LANG", "uz"),
         )
     city = message.text.strip()
@@ -95,10 +101,13 @@ async def city_received(message: Message, i18n: I18n, lang: str, db_user, db, al
 @router.message(F.location)
 async def location_any(message: Message, i18n: I18n, lang: str, db_user, db, aladhan: AladhanClient, settings, scheduler_service, state: FSMContext) -> None:
     if db_user is None:
+        last = getattr(message.from_user, "last_name", None)
+        full_name = f"{message.from_user.first_name} {last}".strip() if last else message.from_user.first_name
         db_user = await get_or_create_user(
             session=db,
             telegram_id=message.from_user.id,
             username=message.from_user.username,
+            full_name=full_name,
             default_lang=getattr(settings, "DEFAULT_LANG", "uz"),
         )
     lat = message.location.latitude

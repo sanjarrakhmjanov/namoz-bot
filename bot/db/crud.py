@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,15 +17,25 @@ async def get_or_create_user(
     session: AsyncSession,
     telegram_id: int,
     username: str | None,
+    full_name: str | None,
     default_lang: str,
 ) -> User:
     user = await get_user_by_telegram_id(session, telegram_id)
     if user:
         if username and user.username != username:
             user.username = username
+        if full_name and user.full_name != full_name:
+            user.full_name = full_name
+        user.last_active_at = datetime.now(timezone.utc)
         return user
 
-    user = User(telegram_id=telegram_id, username=username, lang=default_lang)
+    user = User(
+        telegram_id=telegram_id,
+        username=username,
+        full_name=full_name,
+        lang=default_lang,
+        last_active_at=datetime.now(timezone.utc),
+    )
     session.add(user)
     await session.flush()
     return user
@@ -123,6 +133,13 @@ async def get_or_create_tasbeh(session: AsyncSession, user_id: int) -> Tasbeh:
 
 async def list_users(session: AsyncSession) -> list[User]:
     result = await session.execute(select(User))
+    return list(result.scalars().all())
+
+
+async def list_users_recent(session: AsyncSession, limit: int = 50) -> list[User]:
+    result = await session.execute(
+        select(User).order_by(User.last_active_at.desc().nullslast(), User.created_at.desc()).limit(limit)
+    )
     return list(result.scalars().all())
 
 
