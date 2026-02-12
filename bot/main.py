@@ -1,4 +1,7 @@
 import asyncio
+import os
+
+from aiohttp import web
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
@@ -32,6 +35,23 @@ from bot.handlers import (
     profile,
     errors,
 )
+
+
+async def _start_health_server() -> web.AppRunner | None:
+    port_value = os.getenv("PORT")
+    if not port_value:
+        return None
+    app = web.Application()
+
+    async def health(_request: web.Request) -> web.Response:
+        return web.Response(text="ok")
+
+    app.router.add_get("/", health)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", int(port_value))
+    await site.start()
+    return runner
 
 
 async def main() -> None:
@@ -106,7 +126,12 @@ async def main() -> None:
     )
 
     await scheduler_service.start()
-    await dp.start_polling(bot)
+    runner = await _start_health_server()
+    try:
+        await dp.start_polling(bot)
+    finally:
+        if runner:
+            await runner.cleanup()
 
 
 if __name__ == "__main__":
