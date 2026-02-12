@@ -18,8 +18,18 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
+def _normalize_db_url(url: str) -> str:
+    if url.startswith("postgresql+asyncpg://"):
+        return url
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+    return url
+
+
 def get_url() -> str:
-    return get_settings().database_url
+    return _normalize_db_url(get_settings().database_url)
 
 
 def run_migrations_offline() -> None:
