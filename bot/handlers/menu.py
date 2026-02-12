@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
+from aiogram.exceptions import TelegramBadRequest
 
 from bot.keyboards.inline import main_menu_keyboard
 from bot.utils.i18n import I18n
@@ -56,17 +57,25 @@ async def help_command(message: Message, i18n: I18n, lang: str, settings) -> Non
 
 @router.callback_query(lambda c: c.data == "menu:help")
 async def help_menu(callback: CallbackQuery, i18n: I18n, lang: str, settings) -> None:
-    await callback.message.edit_text(
-        _help_text(i18n, lang, settings),
-        reply_markup=main_menu_keyboard(i18n, lang),
-    )
+    try:
+        await callback.message.edit_text(
+            _help_text(i18n, lang, settings),
+            reply_markup=main_menu_keyboard(i18n, lang),
+        )
+    except TelegramBadRequest as exc:
+        if "message is not modified" not in str(exc):
+            raise
     await callback.answer()
 
 
 @router.callback_query(lambda c: c.data == "menu:back")
 async def back_menu(callback: CallbackQuery, i18n: I18n, lang: str) -> None:
-    await callback.message.edit_text(
-        i18n.t("main_menu", lang),
-        reply_markup=main_menu_keyboard(i18n, lang),
-    )
+    try:
+        await callback.message.edit_text(
+            i18n.t("main_menu", lang),
+            reply_markup=main_menu_keyboard(i18n, lang),
+        )
+    except TelegramBadRequest as exc:
+        if "message is not modified" not in str(exc):
+            raise
     await callback.answer()
